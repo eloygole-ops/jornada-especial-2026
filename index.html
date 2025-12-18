@@ -91,29 +91,7 @@
   Declaro haber leído el documento anterior y aceptar sus condiciones.
 </label>
 
-        <button id="btnEnviar">✍️ Confirmar compromiso</button>
-    </div>
-
-    <div id="informe">
-        <h2>Informe de compromiso de jornada especial 2026</h2>
-        <div id="contenidoInforme"></div>
-        <br>
-        <button onclick="window.print()">🖨️ Imprimir para firma</button>
-    </div>
-
-    <script>
-        // 1) Inicializar Supabase (pon aquí tus datos)
-        const { createClient } = supabase;
-        const SUPABASE_URL = 'https://psjthkzyncbfgciotrty.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzanRoa3p5bmNiZmdjaW90cnR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTc3NzQsImV4cCI6MjA4MDQzMzc3NH0.ukwzmrLpxogOfTsY4roeipIXCjA0XIIikgxMax5PdeM';
-        const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY); // [web:67]
-
-        const dipInput = document.getElementById('dip');
-        const catInput = document.getElementById('categoria');
-        const nomInput = document.getElementById('nombre');
-        const msgBox = document.getElementById('msg');
-
-document.getElementById('btnEnviar').addEventListener('click', async () => {
+        document.getElementById('btnEnviar').addEventListener('click', async () => {
     // 1) Comprobar que ha aceptado el documento
     const chk = document.getElementById('acepto_doc');
     if (!chk.checked) {
@@ -174,7 +152,7 @@ document.getElementById('btnEnviar').addEventListener('click', async () => {
             quedando sujeto a la planificación de servicios y necesidades operativas del Cuerpo.
         </p>
         <br><br>
-        <p>En Lucena, a ${dia} de ${mes} de ${anio}.</p>
+        <p>En ________, a ${dia} de ${mes} de ${anio}.</p>
         <br><br>
         <p>Firma del interesado/a: _________________________________</p>
     `;
