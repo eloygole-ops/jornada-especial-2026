@@ -136,10 +136,15 @@
         return;
     }
 
-    // 6) Generar el informe individual
+    // 6) Generar el informe individual con escudo
     const cont = document.getElementById('contenidoInforme');
     cont.innerHTML = `
-        <p><strong>DAP:</strong> ${dip}</p>
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+            <img src="https://psjthkzyncbfgciotrty.supabase.co/storage/v1/object/public/documentos/escudo_lucena_poli.png" alt="Escudo Policía Local" style="height:70px;">
+            <h2 style="margin:0;">Informe de compromiso de jornada especial 2026</h2>
+        </div>
+
+        <p><strong>DIP:</strong> ${dip}</p>
         <p><strong>Categoría:</strong> ${categoria}</p>
         <p><strong>Nombre y apellidos:</strong> ${nombre}</p>
         <p><strong>Fecha y hora de inscripción:</strong> ${fechaTexto}</p>
@@ -160,6 +165,7 @@
     document.getElementById('formulario').style.display = 'none';
     document.getElementById('informe').style.display = 'block';
 });
+
 
 
     </script>
