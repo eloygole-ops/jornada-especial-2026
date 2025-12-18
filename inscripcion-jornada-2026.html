@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripción Jornada Especial 2026 - Policía Local</title>
+
+    <!-- Supabase JS v2 por CDN -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: #f5f5f5;
+        }
+        h1 { color: #208091; }
+        label { font-weight: 600; margin-top: 0.5rem; display:block; }
+        input, select {
+            width: 100%;
+            padding: 0.6rem;
+            margin: 0.2rem 0 0.6rem 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            background: #208091;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover { background: #1a6472; }
+        #msg { margin-top: 0.5rem; color: #b00020; font-weight: 600; }
+
+        #informe {
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid #208091;
+            background: white;
+            display: none;
+        }
+        #informe h2 { margin-top: 0; }
+        @media print {
+            body { background: white; margin: 0; }
+            #formulario { display: none; }
+            button { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="formulario">
+        <h1>📋 Inscripción Jornada Especial 2026</h1>
+        <p>
+            Mediante este formulario el/la agente manifiesta su compromiso voluntario
+            de realizar la jornada especial durante el año 2026.
+        </p>
+        <p><strong>Plazo de inscripción:</strong> hasta el 29/12/2025.</p>
+
+        <label for="dip" required>DAP:</label>
+        <input type="text" id="dip" maxlength="20" required>
+
+        <label for="categoria">Categoría:</label>
+        <select id="categoria" required>
+            <option value="">Selecciona...</option>
+            <option value="Agente">Agente</option>
+            <option value="Oficial">Oficial</option>
+            <option value="Subinspector">Subinspector</option>
+            <option value="Inspector">Inspector</option>
+        </select>
+
+        <label for="nombre" required>Nombre y apellidos:</label>
+        <input type="text" id="nombre" required>
+
+        <div id="msg"></div>
+        <p>
+  Antes de confirmar, debe leer el siguiente documento:
+  <a href="https://psjthkzyncbfgciotrty.supabase.co/storage/v1/object/public/documentos/condiciones_jornada_2026%20(1).pdf" target="_blank" rel="noopener">
+    Abrir documento de condiciones de la jornada especial 2026
+  </a>
+</p>
+<label>
+  <input type="checkbox" id="acepto_doc">
+  Declaro haber leído el documento anterior y aceptar sus condiciones.
+</label>
+
+        <button id="btnEnviar">✍️ Confirmar compromiso</button>
+    </div>
+
+    <div id="informe">
+        <h2>Informe de compromiso de jornada especial 2026</h2>
+        <div id="contenidoInforme"></div>
+        <br>
+        <button onclick="window.print()">🖨️ Imprimir para firma</button>
+    </div>
+
+    <script>
+        // 1) Inicializar Supabase (pon aquí tus datos)
+        const { createClient } = supabase;
+        const SUPABASE_URL = 'https://psjthkzyncbfgciotrty.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzanRoa3p5bmNiZmdjaW90cnR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTc3NzQsImV4cCI6MjA4MDQzMzc3NH0.ukwzmrLpxogOfTsY4roeipIXCjA0XIIikgxMax5PdeM';
+        const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY); // [web:67]
+
+        const dipInput = document.getElementById('dip');
+        const catInput = document.getElementById('categoria');
+        const nomInput = document.getElementById('nombre');
+        const msgBox = document.getElementById('msg');
+
+        document.getElementById('btnEnviar').addEventListener('click', async () => {
+    // 1) Comprobar que ha aceptado el documento
+    const chk = document.getElementById('acepto_doc');
+    if (!chk.checked) {
+        msgBox.textContent = 'Debes marcar que has leído y aceptado el documento antes de continuar.';
+        return;
+    }
+
+    // 2) Limpiar mensajes previos
+    msgBox.textContent = '';
+
+    // 3) Leer campos del formulario
+    const dip = dipInput.value.trim();
+    const categoria = catInput.value;
+    const nombre = nomInput.value.trim();
+
+    if (!dip || !categoria || !nombre) {
+        msgBox.textContent = 'Debes completar DIP, categoría y nombre.';
+        return;
+    }
+
+    // 4) Fechas
+    const fechaTexto = new Date().toLocaleString('es-ES');
+    const fechaIso = new Date().toISOString();
+
+    // 5) Insertar en Supabase (tabla compromisos_2026)
+    const { error } = await sb
+        .from('compromisos_2026')
+        .insert({
+            dip,
+            categoria,
+            nombre,
+            fecha_inscripcion: fechaIso
+        });
+
+    if (error) {
+        console.error(error);
+        msgBox.textContent = 'Error al registrar el compromiso: ' + error.message;
+        return;
+    }
+
+    // 6) Generar el informe individual
+    const cont = document.getElementById('contenidoInforme');
+    cont.innerHTML = `
+        <p><strong>DIP:</strong> ${dip}</p>
+        <p><strong>Categoría:</strong> ${categoria}</p>
+        <p><strong>Nombre y apellidos:</strong> ${nombre}</p>
+        <p><strong>Fecha y hora de inscripción:</strong> ${fechaTexto}</p>
+        <hr>
+        <p>
+            El/La abajo firmante, <strong>${nombre}</strong> (DIP ${dip}, categoría ${categoria}),
+            manifiesta su compromiso voluntario de realizar la
+            <strong>jornada especial durante el año 2026</strong>,
+            en los términos establecidos por la Jefatura y de conformidad con la normativa vigente,
+            quedando sujeto a la planificación de servicios y necesidades operativas del Cuerpo.
+        </p>
+        <br><br>
+        <p>En ________, a ____ de __________ de 2025.</p>
+        <br><br>
+        <p>Firma del interesado/a: _________________________________</p>
+    `;
+
+    document.getElementById('formulario').style.display = 'none';
+    document.getElementById('informe').style.display = 'block';
+});
+
+    </script>
+</body>
+</html>
