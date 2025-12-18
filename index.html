@@ -40,16 +40,14 @@
         button:hover { background: #1a6472; }
         #msg { margin-top: 0.5rem; color: #b00020; font-weight: 600; }
 
-        /* Recuadro del informe con fondo blanco */
         #informe {
             margin-top: 1.5rem;
             padding: 1.2rem;
             border: 1px solid #208091;
-            background: white;      /* fondo blanco del informe */
+            background: white;
             display: none;
         }
         #informe h2 { margin-top: 0; }
-
         @media print {
             body { background: white; margin: 0; }
             #formulario { display: none; }
@@ -66,7 +64,7 @@
         </p>
         <p><strong>Plazo de inscripción:</strong> hasta el 29/12/2025.</p>
 
-        <label for="dip">DAP:</label>
+        <label for="dip" required>DAP:</label>
         <input type="text" id="dip" maxlength="20" required>
 
         <label for="categoria">Categoría:</label>
@@ -78,114 +76,101 @@
             <option value="Inspector">Inspector</option>
         </select>
 
-        <label for="nombre">Nombre y apellidos:</label>
+        <label for="nombre" required>Nombre y apellidos:</label>
         <input type="text" id="nombre" required>
 
         <div id="msg"></div>
-
         <p>
-          Antes de confirmar, debe leer el siguiente documento:
-          <a href="https://psjthkzyncbfgciotrty.supabase.co/storage/v1/object/public/documentos/condiciones_jornada_2026%20(1).pdf" target="_blank" rel="noopener">
-            Abrir documento de condiciones de la jornada especial 2026
-          </a>
-        </p>
-
-        <label>
-          <input type="checkbox" id="acepto_doc">
-          Declaro haber leído el documento anterior y aceptar sus condiciones.
-        </label>
-
-        <button id="btnEnviar">✍️ Confirmar compromiso</button>
-    </div>
-
-    <div id="informe">
-        <div id="contenidoInforme"></div>
-        <br>
-        <button onclick="window.print()">🖨️ Imprimir para firma</button>
-    </div>
-
-    <script>
-        const { createClient } = supabase;
-        const SUPABASE_URL = 'TU_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = 'TU_SUPABASE_ANON_KEY';
-        const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const dipInput = document.getElementById('dip');
-        const catInput = document.getElementById('categoria');
-        const nomInput = document.getElementById('nombre');
-        const msgBox = document.getElementById('msg');
+  Antes de confirmar, debe leer el siguiente documento:
+  <a href="https://psjthkzyncbfgciotrty.supabase.co/storage/v1/object/public/documentos/condiciones_jornada_2026%20(1).pdf" target="_blank" rel="noopener">
+    Abrir documento de condiciones de la jornada especial 2026
+  </a>
+</p>
+<label>
+  <input type="checkbox" id="acepto_doc">
+  Declaro haber leído el documento anterior y aceptar sus condiciones.
+</label>
 
         document.getElementById('btnEnviar').addEventListener('click', async () => {
-            const chk = document.getElementById('acepto_doc');
-            if (!chk.checked) {
-                msgBox.textContent = 'Debes marcar que has leído y aceptado el documento antes de continuar.';
-                return;
-            }
+    // 1) Comprobar que ha aceptado el documento
+    const chk = document.getElementById('acepto_doc');
+    if (!chk.checked) {
+        msgBox.textContent = 'Debes marcar que has leído y aceptado el documento antes de continuar.';
+        return;
+    }
 
-            msgBox.textContent = '';
+    // 2) Limpiar mensajes previos
+    msgBox.textContent = '';
 
-            const dip = dipInput.value.trim();
-            const categoria = catInput.value;
-            const nombre = nomInput.value.trim();
+    // 3) Leer campos del formulario
+    const dip = dipInput.value.trim();
+    const categoria = catInput.value;
+    const nombre = nomInput.value.trim();
 
-            if (!dip || !categoria || !nombre) {
-                msgBox.textContent = 'Debes completar DAP, categoría y nombre.';
-                return;
-            }
+    if (!dip || !categoria || !nombre) {
+        msgBox.textContent = 'Debes completar DAP, categoría y nombre.';
+        return;
+    }
 
-            const fecha = new Date();
-            const fechaTexto = fecha.toLocaleString('es-ES');
-            const fechaIso = fecha.toISOString();
-            const dia = fecha.getDate();
-            const mes = fecha.toLocaleString('es-ES', { month: 'long' });
-            const anio = fecha.getFullYear();
+    // 4) Fechas
+    const fecha = new Date();
+    const fechaTexto = fecha.toLocaleString('es-ES');
+    const fechaIso = fecha.toISOString();
+    const dia = fecha.getDate();
+    const mes = fecha.toLocaleString('es-ES', { month: 'long' });
+    const anio = fecha.getFullYear();
 
-            const { error } = await sb
-                .from('compromisos_2026')
-                .insert({
-                    dip,
-                    categoria,
-                    nombre,
-                    fecha_inscripcion: fechaIso
-                });
-
-            if (error) {
-                console.error(error);
-                msgBox.textContent = 'Error al registrar el compromiso: ' + error.message;
-                return;
-            }
-
-            const cont = document.getElementById('contenidoInforme');
-            cont.innerHTML = `
-                <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
-                    <img src="https://psjthkzyncbfgciotrty.supabase.co/storage/v1/object/public/documentos/escudo_lucena_poli.png"
-                         alt="Escudo Policía Local" style="height:70px;">
-                    <h2 style="margin:0;">Informe de compromiso de jornada especial 2026</h2>
-                </div>
-                <p><strong>DIP:</strong> ${dip}</p>
-                <p><strong>Categoría:</strong> ${categoria}</p>
-                <p><strong>Nombre y apellidos:</strong> ${nombre}</p>
-                <p><strong>Fecha y hora de inscripción:</strong> ${fechaTexto}</p>
-                <hr>
-                <p>
-                    El/La abajo firmante, <strong>${nombre}</strong> (DAP ${dip}, categoría ${categoria}),
-                    manifiesta su compromiso voluntario de realizar la
-                    <strong>jornada especial durante el año 2026</strong>,
-                    en los términos establecidos por la Jefatura y de conformidad con la normativa vigente,
-                    quedando sujeto a la planificación de servicios y necesidades operativas del Cuerpo.
-                </p>
-                <br><br>
-                <p>En Lucena, a ${dia} de ${mes} de ${anio}.</p>
-                <br><br>
-                <p>Firma del interesado/a: _________________________________</p>
-            `;
-
-            document.getElementById('formulario').style.display = 'none';
-            document.getElementById('informe').style.display = 'block';
+    // 5) Insertar en Supabase (tabla compromisos_2026)
+    const { error } = await sb
+        .from('compromisos_2026')
+        .insert({
+            dip,
+            categoria,
+            nombre,
+            fecha_inscripcion: fechaIso
         });
+
+    if (error) {
+        console.error(error);
+        msgBox.textContent = 'Error al registrar el compromiso: ' + error.message;
+        return;
+    }
+
+    // 6) Generar el informe individual
+    const cont = document.getElementById('contenidoInforme');
+    cont.innerHTML = `
+        <p><strong>DAP:</strong> ${dip}</p>
+        <p><strong>Categoría:</strong> ${categoria}</p>
+        <p><strong>Nombre y apellidos:</strong> ${nombre}</p>
+        <p><strong>Fecha y hora de inscripción:</strong> ${fechaTexto}</p>
+        <hr>
+        <p>
+            El/La abajo firmante, <strong>${nombre}</strong> (DIP ${dip}, categoría ${categoria}),
+            manifiesta su compromiso voluntario de realizar la
+            <strong>jornada especial durante el año 2026</strong>,
+            en los términos establecidos por la Jefatura y de conformidad con la normativa vigente,
+            quedando sujeto a la planificación de servicios y necesidades operativas del Cuerpo.
+        </p>
+        <br><br>
+        <p>En Lucena, a ${dia} de ${mes} de ${anio}.</p>
+        <br><br>     
+        <p>Firma del interesado/a: _________________________________</p>
+        <br><br> 
+        <p>(DIP ${dip}, categoría ${categoria})</p>
+    `;
+
+    document.getElementById('formulario').style.display = 'none';
+    document.getElementById('informe').style.display = 'block';
+});
+
+
     </script>
 </body>
 </html>
+
+       
+
+   
 
 
 
