@@ -59,7 +59,7 @@
     <div id="formulario">
         <h1>📋 Inscripción Jornada Especial 2026</h1>
         <p>
-            Mediante este formulario el/la agente manifiesta su compromiso voluntario
+            Mediante este formulario el/la funcionario/a de Policía Local manifiesta su compromiso voluntario
             de realizar la jornada especial durante el año 2026.
         </p>
         <p><strong>Plazo de inscripción:</strong> hasta el 29/12/2025.</p>
@@ -113,7 +113,7 @@
         const nomInput = document.getElementById('nombre');
         const msgBox = document.getElementById('msg');
 
-        document.getElementById('btnEnviar').addEventListener('click', async () => {
+document.getElementById('btnEnviar').addEventListener('click', async () => {
     // 1) Comprobar que ha aceptado el documento
     const chk = document.getElementById('acepto_doc');
     if (!chk.checked) {
@@ -130,13 +130,17 @@
     const nombre = nomInput.value.trim();
 
     if (!dip || !categoria || !nombre) {
-        msgBox.textContent = 'Debes completar DIP, categoría y nombre.';
+        msgBox.textContent = 'Debes completar DAP, categoría y nombre.';
         return;
     }
 
     // 4) Fechas
-    const fechaTexto = new Date().toLocaleString('es-ES');
-    const fechaIso = new Date().toISOString();
+    const fecha = new Date();
+    const fechaTexto = fecha.toLocaleString('es-ES');
+    const fechaIso = fecha.toISOString();
+    const dia = fecha.getDate();
+    const mes = fecha.toLocaleString('es-ES', { month: 'long' });
+    const anio = fecha.getFullYear();
 
     // 5) Insertar en Supabase (tabla compromisos_2026)
     const { error } = await sb
@@ -170,7 +174,7 @@
             quedando sujeto a la planificación de servicios y necesidades operativas del Cuerpo.
         </p>
         <br><br>
-        <p>En ________, a ____ de __________ de 2025.</p>
+        <p>En Lucena, a ${dia} de ${mes} de ${anio}.</p>
         <br><br>
         <p>Firma del interesado/a: _________________________________</p>
     `;
@@ -179,6 +183,11 @@
     document.getElementById('informe').style.display = 'block';
 });
 
+
     </script>
 </body>
 </html>
+
+       
+
+   
