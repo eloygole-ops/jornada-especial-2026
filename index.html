@@ -49,10 +49,29 @@
         }
         #informe h2 { margin-top: 0; }
 
+        /* Impresión en A4 */
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
         @media print {
-            body { background: white; margin: 0; }
-            #formulario { display: none; }
-            button { display: none; }
+            body {
+                background: white;
+                margin: 0;
+                max-width: 100%;
+            }
+            #formulario {
+                display: none;
+            }
+            #informe {
+                border: none;
+                margin: 0;
+                padding: 0;
+            }
+            button {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -104,21 +123,17 @@
     </div>
 
     <script>
-        // 1) Inicializar Supabase
         const { createClient } = supabase;
         const SUPABASE_URL = 'https://psjthkzyncbfgciotrty.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzanRoa3p5bmNiZmdjaW90cnR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTc3NzQsImV4cCI6MjA4MDQzMzc3NH0.ukwzmrLpxogOfTsY4roeipIXCjA0XIIikgxMax5PdeM';
         const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 2) Referencias a campos
         const dipInput = document.getElementById('dip');
         const catInput = document.getElementById('categoria');
         const nomInput = document.getElementById('nombre');
         const msgBox = document.getElementById('msg');
 
-        // 3) Manejador del botón
         document.getElementById('btnEnviar').addEventListener('click', async () => {
-            // Comprobar que ha aceptado el documento
             const chk = document.getElementById('acepto_doc');
             if (!chk.checked) {
                 msgBox.textContent = 'Debes marcar que has leído y aceptado el documento antes de continuar.';
@@ -143,7 +158,6 @@
             const mes = fecha.toLocaleString('es-ES', { month: 'long' });
             const anio = fecha.getFullYear();
 
-            // Insertar en Supabase
             const { error } = await sb
                 .from('compromisos_2026')
                 .insert({
@@ -159,9 +173,18 @@
                 return;
             }
 
-            // Generar informe
             const cont = document.getElementById('contenidoInforme');
             cont.innerHTML = `
+                <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+                    <img src="https://psjthkzyncbfgciotrty.supabase.co/storage/v1/object/public/documentos/escudo_lucena_poli.png"
+                         alt="Escudo Policía Local" style="height:70px;">
+                    <div>
+                        <h2 style="margin:0;">AYUNTAMIENTO DE LUCENA</h2>
+                        <p style="margin:0;">Policía Local</p>
+                        <p style="margin:0; font-weight:bold;">Informe de compromiso de jornada especial 2026</p>
+                    </div>
+                </div>
+                <hr>
                 <p><strong>DIP:</strong> ${dip}</p>
                 <p><strong>Categoría:</strong> ${categoria}</p>
                 <p><strong>Nombre y apellidos:</strong> ${nombre}</p>
